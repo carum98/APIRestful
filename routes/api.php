@@ -29,4 +29,4 @@ Route::resource('transactions', 'Transaction\TransactionController', ['only'=> [
 Route::resource('sellers', 'Seller\SellerController', ['only'=>['index', 'show']]);
 
 /*User*/
-Route::resource('users', 'User\UserController', ['except'=>['create', 'edit']]);
+Route::resource('users', 'User\UserController', ['except'  => ['create', 'edit']]);
