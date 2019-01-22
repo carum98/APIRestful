@@ -9,6 +9,9 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Database\QueryException;
 
 class Handler extends ExceptionHandler
 {
@@ -76,7 +79,27 @@ class Handler extends ExceptionHandler
             return $this->errorResponse('No se encontró la URL especificada', 404);
         }
 
-        return parent::render($request, $exception);
+        if ($exception instanceof MethodNotAllowedHttpException){
+            return $this->errorResponse('El método especificado en la petición no es válido', 405);
+        }
+
+        if ($exception instanceof HttpException) {
+            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
+        }
+
+        if ($exception instanceof QueryException) {
+            $codigo = $exception->errorInfo[1];
+            if ($codigo == 1451) {
+                return $this->errorResponse('No se puede eliminar de forma permamente el recurso porque está relacionado con algún otro.', 409);
+            }
+        }
+
+        if (config('app.debug')) {
+            return parent::render($request, $exception);            
+        }
+
+        return $this->errorResponse('Falla inesperada. Intente luego', 500);
+
     }
 
         /**
@@ -86,14 +109,14 @@ class Handler extends ExceptionHandler
      * @param  \Illuminate\Auth\AuthenticationException  $exception
      * @return \Illuminate\Http\Response
      */
-    protected function unauthenticated($request, AuthenticationException $exception)
+    /*protected function unauthenticated($request, AuthenticationException $e)
     {
         if ($request->expectsJson()) {
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
         return redirect()->guest('login');
         return $this->errorResponse('No autenticado.', 401);        
-    }
+    }*/
 
     /**
      * Create a response object from the given validation exception.
