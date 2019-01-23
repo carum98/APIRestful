@@ -28,7 +28,16 @@ class CategoryController extends ApiController
      */
     public function store(Request $request)
     {
-        //
+        $rules = [
+            'name' => 'required',
+            'description' => 'required'
+        ];
+
+        $this->validate($request, $rules);
+
+        $category = Category::create($request->all());
+
+        return $this->showOne($category, 201);
     }
 
     /**
@@ -51,7 +60,19 @@ class CategoryController extends ApiController
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $category->fill($request->only([
+            'name',
+            'description'
+        ]));
+        
+        if($category->isClean()){
+            return $this->errorResponse('Debe especificar el menos un valor diferente para actualizar', 422);
+        }
+
+        $category->save();
+
+        return $this->showOne($category);
+
     }
 
     /**
@@ -62,6 +83,8 @@ class CategoryController extends ApiController
      */
     public function destroy(Category $category)
     {
-        //
+        $category -> delete();
+
+        return $this->showOne($category);
     }
 }
