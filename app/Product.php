@@ -32,7 +32,6 @@ class Product extends Model
         return $this->status == Product::PRODUCTO_DISPONIBLE;
     }
 
-
     public function seller()
     {
         return $this->belongsTo(Seller::class);
