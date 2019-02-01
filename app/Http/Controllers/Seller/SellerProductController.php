@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Support\Facades\Storage;
 
 class SellerProductController extends ApiController
 {
@@ -81,6 +82,12 @@ class SellerProductController extends ApiController
                 return $this->errorResponse('Un producto activo debe tener al menos una categoría', 409);
             }
         }
+
+        if ($request->has('image')){
+            Storage::delete($product->image);
+            $product->image = $request->image->store('');
+        }
+
         if ($product->isClean()) {
             return $this->errorResponse('Se debe especificar al menos un valor diferente para actualizar', 422);
         }
@@ -97,6 +104,8 @@ class SellerProductController extends ApiController
     public function destroy(Seller $seller, Product $product)
     {
         $this->verificarVendedor($seller, $product);
+
+        Storage::delete($product->image);
         $product->delete();
         return $this->showOne($product);
     }
