@@ -40,6 +40,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             //'signature: X-Application-name',
+            'cors',
             'throttle:5,1',
             'bindings',
         ],
@@ -57,6 +58,7 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        'cors' => \Barryvdh\Cors\HandleCors::class,
         'client.credentials' => \Laravel\Passport\Http\Middleware\CheckClientCredentials::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
